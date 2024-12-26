@@ -1,0 +1,311 @@
+<html><head><base href="https://websim.ai" />
+<title>Ultra Trippy NFL Fractal Vortex</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    color: #fff;
+  }
+  
+  #canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  
+  #controls {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  button, select {
+    margin: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  button:hover, select:hover {
+    background-color: #555;
+  }
+  
+  #teamSelect {
+    width: 100%;
+  }
+  
+  .slider-container {
+    margin-bottom: 10px;
+  }
+  
+  .slider-container label {
+    display: inline-block;
+    width: 140px;
+  }
+  
+  input[type="range"] {
+    width: 150px;
+    vertical-align: middle;
+  }
+  
+  input[type="number"] {
+    width: 50px;
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="controls">
+  <select id="teamSelect" onchange="changeTeam()">
+    <option value="ARI">Arizona Cardinals</option>
+    <option value="ATL">Atlanta Falcons</option>
+    <option value="BAL">Baltimore Ravens</option>
+    <option value="BUF">Buffalo Bills</option>
+    <option value="CAR">Carolina Panthers</option>
+    <option value="CHI">Chicago Bears</option>
+    <option value="CIN">Cincinnati Bengals</option>
+    <option value="CLE">Cleveland Browns</option>
+    <option value="DAL">Dallas Cowboys</option>
+    <option value="DEN">Denver Broncos</option>
+    <option value="DET">Detroit Lions</option>
+    <option value="GB">Green Bay Packers</option>
+    <option value="HOU">Houston Texans</option>
+    <option value="IND">Indianapolis Colts</option>
+    <option value="JAX">Jacksonville Jaguars</option>
+    <option value="KC">Kansas City Chiefs</option>
+    <option value="LAC">Los Angeles Chargers</option>
+    <option value="LAR">Los Angeles Rams</option>
+    <option value="LV">Las Vegas Raiders</option>
+    <option value="MIA">Miami Dolphins</option>
+    <option value="MIN">Minnesota Vikings</option>
+    <option value="NE">New England Patriots</option>
+    <option value="NO">New Orleans Saints</option>
+    <option value="NYG">New York Giants</option>
+    <option value="NYJ">New York Jets</option>
+    <option value="PHI">Philadelphia Eagles</option>
+    <option value="PIT">Pittsburgh Steelers</option>
+    <option value="SEA">Seattle Seahawks</option>
+    <option value="SF">San Francisco 49ers</option>
+    <option value="TB">Tampa Bay Buccaneers</option>
+    <option value="TEN">Tennessee Titans</option>
+    <option value="WAS">Washington Commanders</option>
+  </select>
+  
+  <div class="slider-container">
+    <label for="rotationSpeed">Rotation Speed:</label>
+    <input type="range" id="rotationSpeed" min="0" max="0.2" step="0.001" value="0.05">
+  </div>
+  
+  <div class="slider-container">
+    <label for="scaleFactor">Scale Factor:</label>
+    <input type="range" id="scaleFactor" min="0.5" max="0.99" step="0.01" value="0.85">
+  </div>
+  
+  <div class="slider-container">
+    <label for="spiralTightness">Spiral Tightness:</label>
+    <input type="range" id="spiralTightness" min="0.1" max="1" step="0.01" value="0.6">
+  </div>
+  
+  <div class="slider-container">
+    <label for="waveIntensity">Wave Intensity:</label>
+    <input type="range" id="waveIntensity" min="0" max="1" step="0.01" value="0.3">
+  </div>
+  
+  <div class="slider-container">
+    <label for="waveFrequency">Wave Frequency:</label>
+    <input type="range" id="waveFrequency" min="0.1" max="2" step="0.01" value="0.5">
+  </div>
+  
+  <div class="slider-container">
+    <label for="fractalDepth">Fractal Depth:</label>
+    <input type="number" id="fractalDepth" min="1" max="50" value="20">
+  </div>
+  
+  <div class="slider-container">
+    <label for="spiralCount">Spiral Count:</label>
+    <input type="number" id="spiralCount" min="1" max="20" value="8">
+  </div>
+  
+  <div class="slider-container">
+    <label for="colorShift">Color Shift Speed:</label>
+    <input type="range" id="colorShift" min="0" max="0.1" step="0.001" value="0.02">
+  </div>
+  
+  <div class="slider-container">
+    <label for="trailEffect">Trail Effect:</label>
+    <input type="range" id="trailEffect" min="0" max="1" step="0.01" value="0.1">
+  </div>
+  
+  <div class="slider-container">
+    <label for="pulseEffect">Pulse Effect:</label>
+    <input type="range" id="pulseEffect" min="0" max="1" step="0.01" value="0.2">
+  </div>
+  
+  <button onclick="randomizeSettings()">Randomize Settings</button>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const nflColors = {
+  ARI: ['#97233F', '#000000', '#FFFFFF'],
+  ATL: ['#A71930', '#000000', '#A5ACAF', '#FFFFFF'],
+  BAL: ['#241773', '#000000', '#9E7C0C', '#FFFFFF'],
+  BUF: ['#00338D', '#C60C30', '#FFFFFF'],
+  CAR: ['#0085CA', '#101820', '#BFC0BF', '#FFFFFF'],
+  CHI: ['#0B162A', '#C83803', '#FFFFFF'],
+  CIN: ['#FB4F14', '#000000', '#FFFFFF'],
+  CLE: ['#311D00', '#FF3C00', '#FFFFFF'],
+  DAL: ['#003594', '#869397', '#FFFFFF'],
+  DEN: ['#FB4F14', '#002244', '#FFFFFF'],
+  DET: ['#0076B6', '#B0B7BC', '#000000', '#FFFFFF'],
+  GB: ['#203731', '#FFB612', '#FFFFFF'],
+  HOU: ['#03202F', '#A71930', '#FFFFFF'],
+  IND: ['#002C5F', '#A2AAAD', '#FFFFFF'],
+  JAX: ['#101820', '#D7A22A', '#006778', '#9F792C', '#FFFFFF'],
+  KC: ['#E31837', '#FFB81C', '#FFFFFF'],
+  LAC: ['#0080C6', '#FFC20E', '#FFFFFF'],
+  LAR: ['#003594', '#FFA300', '#FF8200', '#FFD100', '#FFFFFF'],
+  LV: ['#000000', '#A5ACAF', '#FFFFFF'],
+  MIA: ['#008E97', '#FC4C02', '#005778', '#FFFFFF'],
+  MIN: ['#4F2683', '#FFC62F', '#FFFFFF'],
+  NE: ['#002244', '#C60C30', '#B0B7BC', '#FFFFFF'],
+  NO: ['#D3BC8D', '#101820', '#FFFFFF'],
+  NYG: ['#0B2265', '#A71930', '#A5ACAF', '#FFFFFF'],
+  NYJ: ['#125740', '#000000', '#FFFFFF'],
+  PHI: ['#004C54', '#A5ACAF', '#ACC0C6', '#000000', '#FFFFFF'],
+  PIT: ['#FFB612', '#101820', '#FFFFFF'],
+  SEA: ['#002244', '#69BE28', '#A5ACAF', '#FFFFFF'],
+  SF: ['#AA0000', '#B3995D', '#FFFFFF'],
+  TB: ['#D50A0A', '#34302B', '#0A0A08', '#FF7900', '#FFFFFF'],
+  TEN: ['#0C2340', '#4B92DB', '#C8102E', '#FFFFFF'],
+  WAS: ['#5A1414', '#FFB612', '#FFFFFF']
+};
+
+let currentTeam = 'ARI';
+let time = 0;
+
+function changeTeam() {
+  currentTeam = document.getElementById('teamSelect').value;
+}
+
+function drawHelmet(x, y, size, color, rotation) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, -size/2);
+  ctx.quadraticCurveTo(size/2, -size/2, size/2, 0);
+  ctx.quadraticCurveTo(size/2, size/2, 0, size/2);
+  ctx.quadraticCurveTo(-size/2, size/2, -size/2, 0);
+  ctx.quadraticCurveTo(-size/2, -size/2, 0, -size/2);
+  ctx.fill();
+  
+  // Facemask
+  ctx.strokeStyle = nflColors[currentTeam][1] || color;
+  ctx.lineWidth = size / 10;
+  ctx.beginPath();
+  ctx.moveTo(-size/4, 0);
+  ctx.lineTo(size/4, 0);
+  ctx.stroke();
+  
+  ctx.restore();
+}
+
+function fractalSpiral(x, y, size, depth, angle) {
+  if (depth <= 0 || size < 1) return;
+  
+  const colorShift = parseFloat(document.getElementById('colorShift').value);
+  const pulseEffect = parseFloat(document.getElementById('pulseEffect').value);
+  
+  const colorIndex = (depth + Math.floor(time * colorShift)) % nflColors[currentTeam].length;
+  const color = nflColors[currentTeam][colorIndex];
+  
+  const pulseFactor = 1 + Math.sin(time * 2) * pulseEffect;
+  drawHelmet(x, y, size * pulseFactor, color, angle);
+  
+  const scaleFactor = parseFloat(document.getElementById('scaleFactor').value);
+  const spiralTightness = parseFloat(document.getElementById('spiralTightness').value);
+  const waveIntensity = parseFloat(document.getElementById('waveIntensity').value);
+  const waveFrequency = parseFloat(document.getElementById('waveFrequency').value);
+  
+  const newSize = size * scaleFactor;
+  const newAngle = angle + 0.5 + Math.sin(time * waveFrequency + depth * 0.1) * waveIntensity;
+  
+  const newX = x + Math.cos(newAngle) * size * spiralTightness;
+  const newY = y + Math.sin(newAngle) * size * spiralTightness;
+  
+  fractalSpiral(newX, newY, newSize, depth - 1, newAngle);
+}
+
+function animate() {
+  const trailEffect = parseFloat(document.getElementById('trailEffect').value);
+  ctx.fillStyle = `rgba(0, 0, 0, ${trailEffect})`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const maxSize = Math.min(canvas.width, canvas.height) * 0.4;
+  
+  const rotationSpeed = parseFloat(document.getElementById('rotationSpeed').value);
+  const fractalDepth = parseInt(document.getElementById('fractalDepth').value);
+  const spiralCount = parseInt(document.getElementById('spiralCount').value);
+  
+  for (let i = 0; i < spiralCount; i++) {
+    const angle = (i / spiralCount) * Math.PI * 2 + time * rotationSpeed;
+    const x = centerX + Math.cos(angle) * 100;
+    const y = centerY + Math.sin(angle) * 100;
+    const size = maxSize * (0.5 + Math.sin(time * 0.2 + i) * 0.2);
+    
+    fractalSpiral(x, y, size, fractalDepth, angle);
+  }
+  
+  time += 0.05;
+  requestAnimationFrame(animate);
+}
+
+function randomizeSettings() {
+  document.getElementById('rotationSpeed').value = Math.random() * 0.2;
+  document.getElementById('scaleFactor').value = 0.5 + Math.random() * 0.49;
+  document.getElementById('spiralTightness').value = Math.random();
+  document.getElementById('waveIntensity').value = Math.random();
+  document.getElementById('waveFrequency').value = 0.1 + Math.random() * 1.9;
+  document.getElementById('fractalDepth').value = Math.floor(5 + Math.random() * 46);
+  document.getElementById('spiralCount').value = Math.floor(1 + Math.random() * 20);
+  document.getElementById('colorShift').value = Math.random() * 0.1;
+  document.getElementById('trailEffect').value = Math.random();
+  document.getElementById('pulseEffect').value = Math.random();
+}
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+animate();
+</script>
+</body></html>
